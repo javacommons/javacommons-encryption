@@ -1,12 +1,11 @@
 package com.github.javacommons.encryption;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.ArrayUtils;
 
 public class TestMain {
 
     public static void randomTest() {
-        for (int i = 10; i < 10000; i++) {
+        for (int i = 9000; i < 10000; i++) {
             //String randomString = CryptoUtils.randomAsciiString(i);
             //byte[] randomBytes = randomString.getBytes();
             byte[] randomBytes = CryptoUtils.randomBinaryBytes(i);
@@ -16,9 +15,10 @@ public class TestMain {
             byte[] sha128 = CryptoUtils.randomAsciiBytes(16);
             CryptoSequence chain0 = new CryptoSequence();
             CryptoSequence chain1 = new CryptoSequence();
-            chain1.addCryptoEngine("Blowfish", sha256, 10);
+            //chain1.addCryptoEngine("Blowfish", sha256, 10);
             //chain1.addCryptoEngine("Rijndael", sha256, 10);
             //chain1.addCryptoEngine("jdk::aes", sha128, 10);
+            chain1.addCryptoEngine("bc::aes", sha128, 10);
             String base64 = chain1.encryptToBase64(randomBytes);
             System.out.println(base64);
             byte[] result0 = chain0.decryptFromBase64(base64);

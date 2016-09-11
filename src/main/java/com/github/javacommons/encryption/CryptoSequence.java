@@ -32,6 +32,15 @@ public class CryptoSequence {
      */
     public void addCryptoEngine(String algorithm, byte[] secretKey, int times) {
         CryptoEngine engine = new CryptoEngine(algorithm, secretKey, times);
+        byte[] data = CryptoUtils.randomAsciiBytes(64);
+        data = engine.encryptToBytes(data);
+        if (data == null) {
+            throw new IllegalStateException("Test encryption failed: " + algorithm);
+        }
+        data = engine.decryptFromBytes(data);
+        if (data == null) {
+            throw new IllegalStateException("Test decryption failed: " + algorithm);
+        }
         seq.add(engine);
     }
 
