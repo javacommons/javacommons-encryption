@@ -19,11 +19,12 @@ public class TestMain {
             //chain1.addCryptoEngine("Rijndael", sha256, 10);
             //chain1.addCryptoEngine("jdk::aes", sha128, 10);
             chain1.addCryptoEngine("bc::aes", sha128, 10);
+            chain1.addCryptoEngine("BC::Blowfish", sha128, 10);
             String base64 = chain1.encryptToBase64(randomBytes);
             System.out.println(base64);
             byte[] result0 = chain0.decryptFromBase64(base64);
             System.out.println("" + result0);
-            //if(result0 != null) throw new IllegalStateException();
+            if(result0 != null) throw new IllegalStateException();
             byte[] result1 = chain1.decryptFromBase64(base64);
             System.out.println(CryptoUtils.md5Hex(result1));
             ////System.out.println(result.equals(randomBytes));

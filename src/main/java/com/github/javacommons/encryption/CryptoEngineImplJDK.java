@@ -34,6 +34,8 @@ public class CryptoEngineImplJDK extends CryptoEngineImpl {
             return new CryptoEngineImplJDK(null, "AES", "AES", secretKey, times);
         } else if ("BC::AES".equalsIgnoreCase(algorithm)) {
             return new CryptoEngineImplJDK(new BouncyCastleProvider(), "AES", "AES", secretKey, times);
+        } else if ("BC::Blowfish".equalsIgnoreCase(algorithm)) {
+            return new CryptoEngineImplJDK(new BouncyCastleProvider(), "Blowfish", "Blowfish", secretKey, times);
         } else {
             return null;
         }

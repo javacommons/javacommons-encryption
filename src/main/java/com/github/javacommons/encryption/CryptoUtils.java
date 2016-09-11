@@ -1,5 +1,6 @@
 package com.github.javacommons.encryption;
 
+import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
@@ -10,6 +11,20 @@ import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.lang.RandomStringUtils;
 
 public class CryptoUtils {
+
+    public static byte[] appendByteArrays(byte[]... args) {
+        int len = 0;
+        for(byte[] arg: args)
+        {
+            len += arg.length;
+        }
+        ByteBuffer byteBuf = ByteBuffer.allocate(len);
+        for(byte[] arg: args)
+        {
+            byteBuf.put(arg);
+        }
+        return byteBuf.array();
+    }
 
     public static String base64Encode(byte[] bytes) {
         if (bytes == null) {

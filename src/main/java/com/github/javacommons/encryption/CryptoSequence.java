@@ -3,10 +3,14 @@ package com.github.javacommons.encryption;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.lang.ArrayUtils;
 import org.bouncycastle.util.Arrays;
 
 /**
@@ -48,11 +52,9 @@ public class CryptoSequence {
      * Returns encrypted byte array data of originalSource. データを秘密鍵で暗号化してバイト列で返す
      */
     public byte[] encryptToBytes(byte[] originalSource) {
-        ////if (seq.isEmpty()) return originalSource;
         byte[] bytes = _appendPadding(originalSource);
         for (int i = 0; i < seq.size(); i++) {
             bytes = seq.get(i).encryptToBytes(bytes);
-            ////ArrayUtils.reverse(bytes);
         }
         return bytes;
     }
@@ -79,8 +81,6 @@ public class CryptoSequence {
      */
     public String encryptToBase64(byte[] originalSource) {
         byte[] encryptBytes = encryptToBytes(originalSource);
-        //Base64 base64 = new Base64(true); // (urlSafe)
-        //byte[] encryptBytesBase64 = base64.encodeBase64(encryptBytes, false);
         return CryptoUtils.base64Encode(encryptBytes);
     }
 
@@ -90,8 +90,6 @@ public class CryptoSequence {
      */
     public String objectToBase64(Object o) {
         byte[] encryptBytes = objectToBytes(o);
-        //Base64 base64 = new Base64(true); // (urlSafe)
-        //byte[] encryptBytesBase64 = base64.encodeBase64(encryptBytes, false);
         return CryptoUtils.base64Encode(encryptBytes);
     }
 
@@ -99,10 +97,8 @@ public class CryptoSequence {
      * Returns decrypted byte array data of encryptedBytes. 暗号化データを元のデータに復元する
      */
     public byte[] decryptFromBytes(byte[] encryptedBytes) {
-        ////if (seq.isEmpty()) return encryptedBytes;
         byte[] bytes = encryptedBytes;
         for (int i = seq.size() - 1; i >= 0; i--) {
-            ////ArrayUtils.reverse(bytes);
             bytes = seq.get(i).decryptFromBytes(bytes);
         }
         return _removePadding(bytes);
@@ -150,37 +146,24 @@ public class CryptoSequence {
     private final byte[] tail = "--".getBytes();
 
     private byte[] _appendPadding(byte[] bytes) {
-        ////byte[] head = "--HEAD--".getBytes();
         String md5 = CryptoUtils.md5Hex(bytes);
         byte[] md5Bytes = md5.getBytes();
-        ////System.out.println(md5);
-        ////System.out.println(md5.length());
-        ////System.out.println(head.length);
-        ////System.out.println(new String(head));
-        //byte[] pad = CryptoUtils.randomBinaryBytes(PAD_SIZE);
         byte[] pad = CryptoUtils.randomAsciiBytes(PAD_SIZE);
         if (pad.length != PAD_SIZE) {
             throw new IllegalStateException();
         }
-        ByteBuffer byteBuf = ByteBuffer.allocate(pad.length + head.length + md5Bytes.length + tail.length + bytes.length);
-        byteBuf.put(pad);
-        byteBuf.put(head);
-        byteBuf.put(md5Bytes);
-        byteBuf.put(tail);
-        byteBuf.put(bytes);
-        byte[] result = byteBuf.array();
-        for (int i = 0; i < head.length; i++) {
-            ////byte[] temp = new byte[1];
-            ////temp[0] = result[PAD_SIZE + i];
-            ////System.out.printf("(1)i=%d (%s)\n", i, new String(temp));
+        byte[] result = CryptoUtils.appendByteArrays(pad, head, md5Bytes, tail, bytes);
+        /*for (int i = 0; i < head.length; i++) {
             if (result[PAD_SIZE + i] != head[i]) {
                 return null;
             }
-        }
+        }*/
         return result;
     }
 
     private byte[] _removePadding(byte[] bytes) {
+        return _decodeOK(bytes);
+        /*
         int removeSize = head.length + tail.length + PAD_SIZE + 32; // 32: md5Hex string
         if (bytes.length < removeSize) {
             return null;
@@ -188,9 +171,6 @@ public class CryptoSequence {
         //String s = new String(bytes);
         //System.out.printf("s=%s\n", s);
         for (int i = 0; i < head.length; i++) {
-            ////byte[] temp = new byte[1];
-            ////temp[0] = bytes[PAD_SIZE + i];
-            ////System.out.printf("(2)i=%d (%s)\n", i, new String(temp));
             if (bytes[PAD_SIZE + i] != head[i]) {
                 return null;
             }
@@ -202,7 +182,36 @@ public class CryptoSequence {
         if (!md5A.equals(md5B)) {
             return null;
         }
-        return result;
+        return result;*/
+    }
+
+    private byte[] _decodeOK(byte[] bytes) {
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        bais.skip(PAD_SIZE);
+        byte[] headData = new byte[head.length];
+        if (bais.read(headData, 0, headData.length) != head.length) {
+            return null;
+        }
+        if (!ArrayUtils.isEquals(headData, head)) {
+            return null;
+        }
+        byte[] md5HexBytes = new byte[32];
+        if (bais.read(md5HexBytes, 0, md5HexBytes.length) != 32) {
+            return null;
+        }
+        String md5Hex = new String(md5HexBytes);
+        System.out.printf("(a)%s\n", md5Hex);
+        bais.skip(tail.length);
+        byte[] rest = new byte[bais.available()];
+        if (bais.read(rest, 0, rest.length) != rest.length) {
+            return null;
+        }
+        String restMd5Hex = CryptoUtils.md5Hex(rest);
+        System.out.printf("(b)%s\n", restMd5Hex);
+        if (restMd5Hex.equals(md5Hex)) {
+            return rest;
+        }
+        return null;
     }
 
 }
