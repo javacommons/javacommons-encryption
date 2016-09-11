@@ -68,8 +68,9 @@ public class CryptoEngine {
      */
     public String encryptToBase64(byte[] originalSource) {
         byte[] encryptBytes = encryptToBytes(originalSource);
-        byte[] encryptBytesBase64 = Base64.encodeBase64(encryptBytes, false);
-        return new String(encryptBytesBase64);
+        //Base64 base64 = new Base64(true); // (urlSafe)
+        //byte[] encryptBytesBase64 = base64.encodeBase64(encryptBytes, false);
+        return CryptoUtils.base64Encode(encryptBytes);
     }
 
     /**
@@ -91,7 +92,9 @@ public class CryptoEngine {
      * Base64された暗号化データを元のデータに復元する
      */
     public byte[] decryptFromBase64(String encryptedBase64String) {
-        byte[] encryptBytes = Base64.decodeBase64(encryptedBase64String);
+        //Base64 base64 = new Base64(true); // (urlSafe)
+        //byte[] encryptBytes = base64.decodeBase64(encryptedBase64String);
+        byte[] encryptBytes = CryptoUtils.base64Decode(encryptedBase64String);
         return decryptFromBytes(encryptBytes);
     }
 

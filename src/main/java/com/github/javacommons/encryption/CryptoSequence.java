@@ -26,9 +26,10 @@ public class CryptoSequence {
 
     /**
      * Add a crypto engine to the sequence.
+     *
      * @param algorithm
      * @param secretKey
-     * @param times 
+     * @param times
      */
     public void addCryptoEngine(String algorithm, byte[] secretKey, int times) {
         CryptoEngine engine = new CryptoEngine(algorithm, secretKey, times);
@@ -36,18 +37,13 @@ public class CryptoSequence {
     }
 
     /**
-     * Returns encrypted byte array data of originalSource.
-     * データを秘密鍵で暗号化してバイト列で返す
+     * Returns encrypted byte array data of originalSource. データを秘密鍵で暗号化してバイト列で返す
      */
     public byte[] encryptToBytes(byte[] originalSource) {
         if (seq.isEmpty()) {
             return originalSource;
         }
-        byte[] pad = CryptoUtils.randomBytes(PAD_SIZE);
-        ByteBuffer byteBuf = ByteBuffer.allocate(pad.length + originalSource.length);
-        byteBuf.put(pad);
-        byteBuf.put(originalSource);
-        byte[] bytes = byteBuf.array();
+        byte[] bytes = _appendPadding(originalSource);
         for (int i = 0; i < seq.size(); i++) {
             bytes = seq.get(i).encryptToBytes(bytes);
         }
@@ -55,8 +51,7 @@ public class CryptoSequence {
     }
 
     /**
-     * Returns encrypted byte array data of an Object.
-     * オブジェクトを秘密鍵で暗号化してバイト列で返す
+     * Returns encrypted byte array data of an Object. オブジェクトを秘密鍵で暗号化してバイト列で返す
      */
     public byte[] objectToBytes(Object o) {
         ObjectMapper mapper = new ObjectMapper();
@@ -77,8 +72,9 @@ public class CryptoSequence {
      */
     public String encryptToBase64(byte[] originalSource) {
         byte[] encryptBytes = encryptToBytes(originalSource);
-        byte[] encryptBytesBase64 = Base64.encodeBase64(encryptBytes, false);
-        return new String(encryptBytesBase64);
+        //Base64 base64 = new Base64(true); // (urlSafe)
+        //byte[] encryptBytesBase64 = base64.encodeBase64(encryptBytes, false);
+        return CryptoUtils.base64Encode(encryptBytes);
     }
 
     /**
@@ -87,13 +83,13 @@ public class CryptoSequence {
      */
     public String objectToBase64(Object o) {
         byte[] encryptBytes = objectToBytes(o);
-        byte[] encryptBytesBase64 = Base64.encodeBase64(encryptBytes, false);
-        return new String(encryptBytesBase64);
+        //Base64 base64 = new Base64(true); // (urlSafe)
+        //byte[] encryptBytesBase64 = base64.encodeBase64(encryptBytes, false);
+        return CryptoUtils.base64Encode(encryptBytes);
     }
 
     /**
-     * Returns decrypted byte array data of encryptedBytes.
-     * 暗号化データを元のデータに復元する
+     * Returns decrypted byte array data of encryptedBytes. 暗号化データを元のデータに復元する
      */
     public byte[] decryptFromBytes(byte[] encryptedBytes) {
         if (seq.isEmpty()) {
@@ -103,15 +99,11 @@ public class CryptoSequence {
         for (int i = seq.size() - 1; i >= 0; i--) {
             bytes = seq.get(i).encryptToBytes(bytes);
         }
-        if (bytes.length < PAD_SIZE) {
-            return null;
-        }
-        return Arrays.copyOfRange(bytes, PAD_SIZE, bytes.length);
+        return _removePadding(bytes);
     }
 
     /**
-     * Restore an Object from encrypted byte array.
-     * 暗号化データを元のオブジェクトに復元する
+     * Restore an Object from encrypted byte array. 暗号化データを元のオブジェクトに復元する
      */
     public <T extends Object> T objectFromBytes(byte[] encryptedBytes, Class<T> valueType) {
         byte[] bytes = decryptFromBytes(encryptedBytes);
@@ -131,7 +123,9 @@ public class CryptoSequence {
      * Base64された暗号化データを元のデータに復元する
      */
     public byte[] decryptFromBase64(String encryptedBase64String) {
-        byte[] encryptBytes = Base64.decodeBase64(encryptedBase64String);
+        //Base64 base64 = new Base64(true); // (urlSafe)
+        //byte[] encryptBytes = base64.decodeBase64(encryptedBase64String);
+        byte[] encryptBytes = CryptoUtils.base64Decode(encryptedBase64String);
         return decryptFromBytes(encryptBytes);
     }
 
@@ -140,8 +134,68 @@ public class CryptoSequence {
      * Base64された暗号化データを元のデータに復元する
      */
     public <T extends Object> T objectFromBase64(String encryptedBase64String, Class<T> valueType) {
-        byte[] encryptBytes = Base64.decodeBase64(encryptedBase64String);
+        //Base64 base64 = new Base64(true); // (urlSafe)
+        //byte[] encryptBytes = base64.decodeBase64(encryptedBase64String);
+        byte[] encryptBytes = CryptoUtils.base64Decode(encryptedBase64String);
         return objectFromBytes(encryptBytes, valueType);
+    }
+
+    private final byte[] head = "--HEAD--MD5=".getBytes();
+    private final byte[] tail = "--".getBytes();
+
+    private byte[] _appendPadding(byte[] bytes) {
+        ////byte[] head = "--HEAD--".getBytes();
+        String md5 = CryptoUtils.md5Hex(bytes);
+        byte[] md5Bytes = md5.getBytes();
+        ////System.out.println(md5);
+        ////System.out.println(md5.length());
+        ////System.out.println(head.length);
+        ////System.out.println(new String(head));
+        byte[] pad = CryptoUtils.randomBinaryBytes(PAD_SIZE);
+        if (pad.length != PAD_SIZE) {
+            throw new IllegalStateException();
+        }
+        ByteBuffer byteBuf = ByteBuffer.allocate(pad.length + head.length + md5Bytes.length + tail.length + bytes.length);
+        byteBuf.put(pad);
+        byteBuf.put(head);
+        byteBuf.put(md5Bytes);
+        byteBuf.put(tail);
+        byteBuf.put(bytes);
+        byte[] result = byteBuf.array();
+        for (int i = 0; i < head.length; i++) {
+            ////byte[] temp = new byte[1];
+            ////temp[0] = result[PAD_SIZE + i];
+            ////System.out.printf("(1)i=%d (%s)\n", i, new String(temp));
+            if (result[PAD_SIZE + i] != head[i]) {
+                return null;
+            }
+        }
+        return result;
+    }
+
+    private byte[] _removePadding(byte[] bytes) {
+        int removeSize = head.length + tail.length + PAD_SIZE + 32; // 32: md5Hex string
+        if (bytes.length < removeSize) {
+            return null;
+        }
+        ////String s = new String(bytes);
+        ////System.out.printf("s=%s\n", s);
+        for (int i = 0; i < head.length; i++) {
+            ////byte[] temp = new byte[1];
+            ////temp[0] = bytes[PAD_SIZE + i];
+            ////System.out.printf("(2)i=%d (%s)\n", i, new String(temp));
+            if (bytes[PAD_SIZE + i] != head[i]) {
+                return null;
+            }
+        }
+        byte[] md5Bytes = Arrays.copyOfRange(bytes, PAD_SIZE + head.length, PAD_SIZE + head.length + 32);
+        String md5A = new String(md5Bytes);
+        byte[] result = Arrays.copyOfRange(bytes, removeSize, bytes.length);
+        String md5B = CryptoUtils.md5Hex(result);
+        if (!md5A.equals(md5B)) {
+            return null;
+        }
+        return result;
     }
 
 }

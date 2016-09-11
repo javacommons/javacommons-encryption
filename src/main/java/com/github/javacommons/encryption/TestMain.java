@@ -15,16 +15,17 @@ public class TestMain {
         en.addCryptoEngine("Blowfish", sha256, 10);
         en.addCryptoEngine("AES", sha256, 10);
         byte[] data = "abcテスト".getBytes();
+        data = ("|" + CryptoUtils.randomAsciiString(1024)).getBytes();
         byte[] enc = en.encryptToBytes(data);
         String enc2 = en.encryptToBase64(data);
-        System.out.println(enc2);
+        System.out.println("enc2="+enc2);
         //System.out.println(enc.length);
         byte[] dec = en.decryptFromBytes(enc);
         System.out.println(new String(dec));
 
         Double x = 1.23456789;
         String x64 = en.objectToBase64(x);
-        System.out.println(x64);
+        System.out.println("x64="+x64);
         Double y = en.objectFromBase64(x64, Double.class);
         System.out.println(y);
         System.out.println(x == y);
