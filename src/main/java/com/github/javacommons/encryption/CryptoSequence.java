@@ -5,13 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.lang.ArrayUtils;
-import org.bouncycastle.util.Arrays;
 
 /**
  * Combination of multiple crypto engines.
@@ -162,30 +158,6 @@ public class CryptoSequence {
     }
 
     private byte[] _removePadding(byte[] bytes) {
-        return _decodeOK(bytes);
-        /*
-        int removeSize = head.length + tail.length + PAD_SIZE + 32; // 32: md5Hex string
-        if (bytes.length < removeSize) {
-            return null;
-        }
-        //String s = new String(bytes);
-        //System.out.printf("s=%s\n", s);
-        for (int i = 0; i < head.length; i++) {
-            if (bytes[PAD_SIZE + i] != head[i]) {
-                return null;
-            }
-        }
-        byte[] md5Bytes = Arrays.copyOfRange(bytes, PAD_SIZE + head.length, PAD_SIZE + head.length + 32);
-        String md5A = new String(md5Bytes);
-        byte[] result = Arrays.copyOfRange(bytes, removeSize, bytes.length);
-        String md5B = CryptoUtils.md5Hex(result);
-        if (!md5A.equals(md5B)) {
-            return null;
-        }
-        return result;*/
-    }
-
-    private byte[] _decodeOK(byte[] bytes) {
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
         bais.skip(PAD_SIZE);
         byte[] headData = new byte[head.length];
@@ -200,14 +172,14 @@ public class CryptoSequence {
             return null;
         }
         String md5Hex = new String(md5HexBytes);
-        System.out.printf("(a)%s\n", md5Hex);
+        ////System.out.printf("(a)%s\n", md5Hex);
         bais.skip(tail.length);
         byte[] rest = new byte[bais.available()];
         if (bais.read(rest, 0, rest.length) != rest.length) {
             return null;
         }
         String restMd5Hex = CryptoUtils.md5Hex(rest);
-        System.out.printf("(b)%s\n", restMd5Hex);
+        ////System.out.printf("(b)%s\n", restMd5Hex);
         if (restMd5Hex.equals(md5Hex)) {
             return rest;
         }

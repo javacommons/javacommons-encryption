@@ -5,7 +5,7 @@ import org.apache.commons.lang.ArrayUtils;
 public class TestMain {
 
     public static void randomTest() {
-        for (int i = 9000; i < 10000; i++) {
+        for (int i = 9990; i < 10000; i++) {
             //String randomString = CryptoUtils.randomAsciiString(i);
             //byte[] randomBytes = randomString.getBytes();
             byte[] randomBytes = CryptoUtils.randomBinaryBytes(i);
