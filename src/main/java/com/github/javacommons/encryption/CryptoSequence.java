@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.util.Arrays;
 
 /**
@@ -40,12 +39,11 @@ public class CryptoSequence {
      * Returns encrypted byte array data of originalSource. データを秘密鍵で暗号化してバイト列で返す
      */
     public byte[] encryptToBytes(byte[] originalSource) {
-        if (seq.isEmpty()) {
-            return originalSource;
-        }
+        ////if (seq.isEmpty()) return originalSource;
         byte[] bytes = _appendPadding(originalSource);
         for (int i = 0; i < seq.size(); i++) {
             bytes = seq.get(i).encryptToBytes(bytes);
+            ////ArrayUtils.reverse(bytes);
         }
         return bytes;
     }
@@ -92,12 +90,11 @@ public class CryptoSequence {
      * Returns decrypted byte array data of encryptedBytes. 暗号化データを元のデータに復元する
      */
     public byte[] decryptFromBytes(byte[] encryptedBytes) {
-        if (seq.isEmpty()) {
-            return encryptedBytes;
-        }
+        ////if (seq.isEmpty()) return encryptedBytes;
         byte[] bytes = encryptedBytes;
         for (int i = seq.size() - 1; i >= 0; i--) {
-            bytes = seq.get(i).encryptToBytes(bytes);
+            ////ArrayUtils.reverse(bytes);
+            bytes = seq.get(i).decryptFromBytes(bytes);
         }
         return _removePadding(bytes);
     }
@@ -151,7 +148,8 @@ public class CryptoSequence {
         ////System.out.println(md5.length());
         ////System.out.println(head.length);
         ////System.out.println(new String(head));
-        byte[] pad = CryptoUtils.randomBinaryBytes(PAD_SIZE);
+        //byte[] pad = CryptoUtils.randomBinaryBytes(PAD_SIZE);
+        byte[] pad = CryptoUtils.randomAsciiBytes(PAD_SIZE);
         if (pad.length != PAD_SIZE) {
             throw new IllegalStateException();
         }
@@ -178,8 +176,8 @@ public class CryptoSequence {
         if (bytes.length < removeSize) {
             return null;
         }
-        ////String s = new String(bytes);
-        ////System.out.printf("s=%s\n", s);
+        //String s = new String(bytes);
+        //System.out.printf("s=%s\n", s);
         for (int i = 0; i < head.length; i++) {
             ////byte[] temp = new byte[1];
             ////temp[0] = bytes[PAD_SIZE + i];

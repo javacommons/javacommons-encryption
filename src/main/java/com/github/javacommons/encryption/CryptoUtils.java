@@ -11,11 +11,13 @@ import org.apache.commons.lang.RandomStringUtils;
 
 public class CryptoUtils {
 
-    public static String base64Encode(byte[] bytes)
-    {
+    public static String base64Encode(byte[] bytes) {
+        if (bytes == null) {
+            return null;
+        }
         Base64 base64 = new Base64(true); // (urlSafe)
         byte[] base64Bytes = base64.encodeBase64(bytes, false);
-        String  base64String = new String(base64Bytes);
+        String base64String = new String(base64Bytes);
         base64String = "--BASE64--" + base64String + "--BASE64--";
         try {
             //return URLEncoder.encode(base64String, "UTF-8");
@@ -24,9 +26,11 @@ public class CryptoUtils {
             return null;
         }
     }
-    
-    public static byte[] base64Decode(String base64String)
-    {
+
+    public static byte[] base64Decode(String base64String) {
+        if (base64String == null) {
+            return null;
+        }
         Base64 base64 = new Base64(true); // (urlSafe)
         try {
             //String decodedResult = URLDecoder.decode(base64String, "UTF-8");
@@ -37,9 +41,8 @@ public class CryptoUtils {
             return null;
         }
     }
-    
-    public static String hex(byte[] bytes)
-    {
+
+    public static String hex(byte[] bytes) {
         return Hex.encodeHexString(bytes);
     }
 
@@ -59,9 +62,8 @@ public class CryptoUtils {
         // 16進数文字列でMD5値を取得する
         return DigestUtils.sha256Hex(bytes);
     }
-    
-    public static byte[] randomBinaryBytes(int count)
-    {
+
+    public static byte[] randomBinaryBytes(int count) {
         SecureRandom random = new SecureRandom();
         byte bytes[] = new byte[count];
         random.nextBytes(bytes);
