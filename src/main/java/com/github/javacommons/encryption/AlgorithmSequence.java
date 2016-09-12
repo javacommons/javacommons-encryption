@@ -12,15 +12,15 @@ import org.apache.commons.lang.ArrayUtils;
 /**
  * Combination of multiple crypto engines.
  */
-public class CryptoSequence {
+public class AlgorithmSequence {
 
     final static int PAD_SIZE = 32;
-    final List<CryptoEngine> seq = new ArrayList<>();
+    final List<Algorithm> seq = new ArrayList<>();
 
     /**
      * Combination of multiple crypto engines.
      */
-    public CryptoSequence() {
+    public AlgorithmSequence() {
     }
 
     /**
@@ -30,8 +30,8 @@ public class CryptoSequence {
      * @param secretKey
      * @param times
      */
-    public void addCryptoEngine(String algorithm, byte[] secretKey, int times) {
-        CryptoEngine engine = new CryptoEngine(algorithm, secretKey, times);
+    public void addAlgorithm(String algorithm, byte[] secretKey, int times) {
+        Algorithm engine = new Algorithm(algorithm, secretKey, times);
         byte[] data = CryptoUtils.randomAsciiBytes(64);
         data = engine.encryptToBytes(data);
         if (data == null) {

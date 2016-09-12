@@ -4,7 +4,7 @@ package com.github.javacommons.encryption;
  * Crypto Engine encapsulation specified by algorithm, secret key, and iteration
  * times.
  */
-public class CryptoEngine {
+public class Algorithm {
 
     final CryptoEngineImpl impl;
 
@@ -12,14 +12,15 @@ public class CryptoEngine {
      * Crypto Engine encapsulation specified by algorithm, secret key, and
      * iteration times.
      */
-    public CryptoEngine(String algorithm, byte[] secretKey, int times) {
+    public Algorithm(String algorithmSpec, byte[] secretKey, int times) {
         if (times <= 0) {
             throw new IllegalStateException("Times must be greater than zero: " + times);
         }
-        this.impl = getEngineImpl(algorithm, secretKey, times);
-        if (this.impl == null) {
-            throw new IllegalStateException("Algorithm not found: " + algorithm);
-        }
+        //this.impl = getEngineImpl(algorithm, secretKey, times);
+        this.impl = new CryptoEngineImplJDK(algorithmSpec, secretKey, times);
+        //if (this.impl == null) {
+        //   throw new IllegalStateException("Algorithm not found: " + algorithm);
+        //}
     }
 
     /**
@@ -56,11 +57,12 @@ public class CryptoEngine {
         return decryptFromBytes(encryptBytes);
     }
 
+    /*
     private CryptoEngineImpl getEngineImpl(String algorithm, byte[] secretKey, int times) {
         CryptoEngineImpl impl;
         impl = CryptoEngineImplBC.findAlgorithm(algorithm, secretKey, times);
         if(impl != null) return impl;
         impl = CryptoEngineImplJDK.findAlgorithm(algorithm, secretKey, times);
         return impl;
-    }
+    }*/
 }
