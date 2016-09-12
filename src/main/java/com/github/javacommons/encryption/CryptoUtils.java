@@ -108,6 +108,7 @@ public class CryptoUtils {
         return RandomStringUtils.randomAscii(count);
     }
 
+    /*
     public static String randomJapaneseString(int count) {
         String result = "";
         SecureRandom sr = new SecureRandom();
@@ -116,6 +117,6 @@ public class CryptoUtils {
             result += UnicodeRange.JAPANESE_RANGE.get(index);
         }
         return result;
-    }
+    }*/
 
 }

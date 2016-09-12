@@ -38,8 +38,8 @@ public class TestMain {
     }
 
     public static void main(String[] args) throws UnsupportedEncodingException, FileNotFoundException {
-        String jap = CryptoUtils.randomJapaneseString(16);
-        System.out.println(jap);
+        //String jap = CryptoUtils.randomJapaneseString(16);
+        //System.out.println(jap);
         //GenerateMain.main(new String[0]);
         //if(true) return;
         byte[] key = "abc".getBytes();
