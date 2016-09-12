@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
+import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -34,32 +35,34 @@ public class CryptoUtils {
         if (bytes == null) {
             return null;
         }
-        Base64 base64 = new Base64(true); // (urlSafe)
-        byte[] base64Bytes = base64.encodeBase64(bytes, false);
-        String base64String = new String(base64Bytes);
-        //base64String = "--BASE64--" + base64String + "--BASE64--";
-        base64String = "--BASE64--" + base64String;
+        Base64 base64 = new Base64(-1, "\n".getBytes(), true); // no newline & urlSafe
+        String base64String = base64.encodeAsString(bytes);
+        return base64String;
+        /*
         try {
-            //return URLEncoder.encode(base64String, "UTF-8");
+            base64String = "--URLENCODED_BASE64--" + base64String;
             return new URLCodec("UTF-8").encode(base64String);
         } catch (EncoderException ex) {
             return null;
-        }
+        }*/
     }
 
     public static byte[] base64Decode(String base64String) {
         if (base64String == null) {
             return null;
         }
-        Base64 base64 = new Base64(true); // (urlSafe)
+        return Base64.decodeBase64(base64String);
+        /*
         try {
-            //String decodedResult = URLDecoder.decode(base64String, "UTF-8");
-            String decodedResult = new URLCodec("UTF-8").decode(base64String);
-            decodedResult = decodedResult.replace("--BASE64--", "");
-            return base64.decodeBase64(decodedResult);
+            String header = "--URLENCODED_BASE64--";
+            if (base64String.startsWith(header)) {
+                base64String = base64String.substring(header.length());
+                base64String = new URLCodec("UTF-8").decode(base64String);
+            }
+            return Base64.decodeBase64(base64String);
         } catch (DecoderException ex) {
             return null;
-        }
+        }*/
     }
 
     public static String hex(byte[] bytes) {
@@ -103,6 +106,16 @@ public class CryptoUtils {
 
     public static String randomAsciiString(int count) {
         return RandomStringUtils.randomAscii(count);
+    }
+
+    public static String randomJapaneseString(int count) {
+        String result = "";
+        SecureRandom sr = new SecureRandom();
+        for (int i = 0; i < count; i++) {
+            int index = sr.nextInt(UnicodeRange.JAPANESE_RANGE.size());
+            result += UnicodeRange.JAPANESE_RANGE.get(index);
+        }
+        return result;
     }
 
 }

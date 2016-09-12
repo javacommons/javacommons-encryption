@@ -1,5 +1,7 @@
 package com.github.javacommons.encryption;
 
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
 import org.apache.commons.lang.ArrayUtils;
 
 public class TestMain {
@@ -35,7 +37,11 @@ public class TestMain {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UnsupportedEncodingException, FileNotFoundException {
+        String jap = CryptoUtils.randomJapaneseString(16);
+        System.out.println(jap);
+        //GenerateMain.main(new String[0]);
+        //if(true) return;
         byte[] key = "abc".getBytes();
         byte[] sha256 = CryptoUtils.sha256(key);
         //System.out.println(sha256.length);

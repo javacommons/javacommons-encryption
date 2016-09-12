@@ -156,7 +156,7 @@ public class CommonKeyAlgorithm {
             CryptoUtils.assertBoolean(md5Bytes.length == 32);
             baos.write(md5Bytes);
             // SHA1
-            baos.write(md5Head);
+            baos.write(sha1Head);
             String sha1 = CryptoUtils.sha1Hex(bytes).toLowerCase();
             byte[] sha1Bytes = sha1.getBytes();
             CryptoUtils.assertBoolean(sha1Bytes.length == 40);
@@ -187,7 +187,7 @@ public class CommonKeyAlgorithm {
         }
         String md5Hex = new String(md5HexBytes);
         // SHA1
-        bais.skip(md5Head.length);
+        bais.skip(sha1Head.length);
         byte[] sha1HexBytes = new byte[40];
         if (bais.read(sha1HexBytes, 0, sha1HexBytes.length) != sha1HexBytes.length) {
             return null;
