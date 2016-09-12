@@ -4,19 +4,19 @@ package com.github.javacommons.encryption;
  * Crypto Engine encapsulation specified by algorithm, secret key, and iteration
  * times.
  */
-public class Algorithm {
+public class CommonKeyEngine {
 
-    final AlgorithmEngine engine;
+    final EngineCoreInterface engine;
 
     /**
      * Crypto Engine encapsulation specified by algorithm, secret key, and
      * iteration times.
      */
-    protected Algorithm(String algorithmSpec, byte[] secretKey, int times) {
+    protected CommonKeyEngine(String engineSpec, byte[] secretKey, int times) {
         if (times <= 0) {
             throw new IllegalStateException("Times must be greater than zero: " + times);
         }
-        this.engine = new CommonKeyAlgorithmEngine(algorithmSpec, secretKey, times);
+        this.engine = new CommonKeyEngineCore(engineSpec, secretKey, times);
     }
 
     /**

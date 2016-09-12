@@ -4,14 +4,14 @@ import java.security.Key;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-public class CommonKeyAlgorithmEngine extends AlgorithmEngine {
+public class CommonKeyEngineCore extends EngineCoreInterface {
 
-    final AlgorithmSpecParser parser;
+    final EngineSpecParser parser;
     final byte[] secretKey;
     final int times;
 
-    protected CommonKeyAlgorithmEngine(String algorithmSpec, byte[] secretKey, int times) {
-        this.parser = new AlgorithmSpecParser(algorithmSpec);
+    protected CommonKeyEngineCore(String engineSpec, byte[] secretKey, int times) {
+        this.parser = new EngineSpecParser(engineSpec);
         this.secretKey = secretKey;
         this.times = times;
     }

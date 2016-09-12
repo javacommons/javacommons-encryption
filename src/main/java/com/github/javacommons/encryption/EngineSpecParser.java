@@ -5,7 +5,7 @@ import java.security.Security;
 import javax.crypto.Cipher;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-public class AlgorithmSpecParser {
+public class EngineSpecParser {
 
     public final String providerName;
     public final Provider provider;
@@ -13,7 +13,7 @@ public class AlgorithmSpecParser {
     public final Cipher cipher;
     public final String secretKeySpec;
 
-    protected AlgorithmSpecParser(String algorithmSpec) {
+    protected EngineSpecParser(String algorithmSpec) {
         if (algorithmSpec.contains("::")) {
             String[] array = algorithmSpec.split("::");
             if (array.length != 2) {

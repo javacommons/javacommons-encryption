@@ -4,44 +4,44 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang.ArrayUtils;
 
 /**
  * Combination of multiple crypto engines.
  */
-public class AlgorithmSequence {
+public class CommonKeyAlgorithm {
 
     final static int PAD_SIZE = 32;
-    final List<Algorithm> seq = new ArrayList<>();
+    final List<CommonKeyEngine> engineList = new ArrayList<>();
 
     /**
      * Combination of multiple crypto engines.
      */
-    public AlgorithmSequence() {
+    public CommonKeyAlgorithm() {
     }
 
     /**
      * Add a crypto engine to the sequence.
      *
-     * @param algorithm
+     * @param engineSpec
      * @param secretKey
      * @param times
      */
-    public void addAlgorithm(String algorithm, byte[] secretKey, int times) {
-        Algorithm engine = new Algorithm(algorithm, secretKey, times);
+    public void addEngine(String engineSpec, byte[] secretKey, int times) {
+        CommonKeyEngine engine = new CommonKeyEngine(engineSpec, secretKey, times);
         byte[] data = CryptoUtils.randomAsciiBytes(64);
         data = engine.encryptToBytes(data);
         if (data == null) {
-            throw new IllegalStateException("Test encryption failed: " + algorithm);
+            throw new IllegalStateException("Test encryption failed: " + engineSpec);
         }
         data = engine.decryptFromBytes(data);
         if (data == null) {
-            throw new IllegalStateException("Test decryption failed: " + algorithm);
+            throw new IllegalStateException("Test decryption failed: " + engineSpec);
         }
-        seq.add(engine);
+        engineList.add(engine);
     }
 
     /**
@@ -49,8 +49,8 @@ public class AlgorithmSequence {
      */
     public byte[] encryptToBytes(byte[] originalSource) {
         byte[] bytes = _appendPadding(originalSource);
-        for (int i = 0; i < seq.size(); i++) {
-            bytes = seq.get(i).encryptToBytes(bytes);
+        for (int i = 0; i < engineList.size(); i++) {
+            bytes = engineList.get(i).encryptToBytes(bytes);
         }
         return bytes;
     }
@@ -94,8 +94,8 @@ public class AlgorithmSequence {
      */
     public byte[] decryptFromBytes(byte[] encryptedBytes) {
         byte[] bytes = encryptedBytes;
-        for (int i = seq.size() - 1; i >= 0; i--) {
-            bytes = seq.get(i).decryptFromBytes(bytes);
+        for (int i = engineList.size() - 1; i >= 0; i--) {
+            bytes = engineList.get(i).decryptFromBytes(bytes);
         }
         return _removePadding(bytes);
     }
@@ -138,52 +138,77 @@ public class AlgorithmSequence {
         return objectFromBytes(encryptBytes, valueType);
     }
 
-    private final byte[] head = "--HEAD--MD5=".getBytes();
+    private final byte[] md5Head = "--MD5=".getBytes();
+    private final byte[] sha1Head = "--SHA1=".getBytes();
     private final byte[] tail = "--".getBytes();
 
     private byte[] _appendPadding(byte[] bytes) {
-        String md5 = CryptoUtils.md5Hex(bytes);
-        byte[] md5Bytes = md5.getBytes();
-        byte[] pad = CryptoUtils.randomAsciiBytes(PAD_SIZE);
-        if (pad.length != PAD_SIZE) {
-            throw new IllegalStateException();
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            // PAD
+            byte[] pad = CryptoUtils.randomAsciiBytes(PAD_SIZE);
+            CryptoUtils.assertBoolean(pad.length == PAD_SIZE);
+            baos.write(pad);
+            // MD5
+            baos.write(md5Head);
+            String md5 = CryptoUtils.md5Hex(bytes).toLowerCase();
+            byte[] md5Bytes = md5.getBytes();
+            CryptoUtils.assertBoolean(md5Bytes.length == 32);
+            baos.write(md5Bytes);
+            // SHA1
+            baos.write(md5Head);
+            String sha1 = CryptoUtils.sha1Hex(bytes).toLowerCase();
+            byte[] sha1Bytes = sha1.getBytes();
+            CryptoUtils.assertBoolean(sha1Bytes.length == 40);
+            baos.write(sha1Bytes);
+            // TAIL
+            baos.write(tail);
+            // Content
+            baos.write(bytes);
+            //
+            //byte[] result = CryptoUtils.appendByteArrays(pad, head, md5Bytes, tail, bytes);
+            byte[] result = baos.toByteArray();
+            return result;
+        } catch (IOException ex) {
+            //Logger.getLogger(CommonKeyAlgorithm.class.getName()).log(Level.SEVERE, null, ex);
+            throw new IllegalStateException(ex);
         }
-        byte[] result = CryptoUtils.appendByteArrays(pad, head, md5Bytes, tail, bytes);
-        /*for (int i = 0; i < head.length; i++) {
-            if (result[PAD_SIZE + i] != head[i]) {
-                return null;
-            }
-        }*/
-        return result;
     }
 
     private byte[] _removePadding(byte[] bytes) {
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        // PAD
         bais.skip(PAD_SIZE);
-        byte[] headData = new byte[head.length];
-        if (bais.read(headData, 0, headData.length) != head.length) {
-            return null;
-        }
-        if (!ArrayUtils.isEquals(headData, head)) {
-            return null;
-        }
+        // MD5
+        bais.skip(md5Head.length);
         byte[] md5HexBytes = new byte[32];
-        if (bais.read(md5HexBytes, 0, md5HexBytes.length) != 32) {
+        if (bais.read(md5HexBytes, 0, md5HexBytes.length) != md5HexBytes.length) {
             return null;
         }
         String md5Hex = new String(md5HexBytes);
-        ////System.out.printf("(a)%s\n", md5Hex);
+        // SHA1
+        bais.skip(md5Head.length);
+        byte[] sha1HexBytes = new byte[40];
+        if (bais.read(sha1HexBytes, 0, sha1HexBytes.length) != sha1HexBytes.length) {
+            return null;
+        }
+        String sha1Hex = new String(sha1HexBytes);
+        // TAIL
         bais.skip(tail.length);
+        // Check Digests
         byte[] rest = new byte[bais.available()];
         if (bais.read(rest, 0, rest.length) != rest.length) {
             return null;
         }
         String restMd5Hex = CryptoUtils.md5Hex(rest);
-        ////System.out.printf("(b)%s\n", restMd5Hex);
-        if (restMd5Hex.equals(md5Hex)) {
-            return rest;
+        if (!restMd5Hex.equals(md5Hex)) {
+            return null;
         }
-        return null;
+        String restSha1Hex = CryptoUtils.sha1Hex(rest);
+        if (!restSha1Hex.equals(sha1Hex)) {
+            return null;
+        }
+        return rest;
     }
 
 }

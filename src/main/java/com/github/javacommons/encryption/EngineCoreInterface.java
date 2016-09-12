@@ -1,6 +1,6 @@
 package com.github.javacommons.encryption;
 
-public abstract class AlgorithmEngine {
+public abstract class EngineCoreInterface {
 
     /**
      * Returns encrypted byte array data of originalSource.

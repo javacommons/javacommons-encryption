@@ -12,15 +12,19 @@ import org.apache.commons.lang.RandomStringUtils;
 
 public class CryptoUtils {
 
+    public static void assertBoolean(boolean b) {
+        if (!b) {
+            throw new IllegalStateException("Assertion failed.");
+        }
+    }
+
     public static byte[] appendByteArrays(byte[]... args) {
         int len = 0;
-        for(byte[] arg: args)
-        {
+        for (byte[] arg : args) {
             len += arg.length;
         }
         ByteBuffer byteBuf = ByteBuffer.allocate(len);
-        for(byte[] arg: args)
-        {
+        for (byte[] arg : args) {
             byteBuf.put(arg);
         }
         return byteBuf.array();
@@ -33,7 +37,8 @@ public class CryptoUtils {
         Base64 base64 = new Base64(true); // (urlSafe)
         byte[] base64Bytes = base64.encodeBase64(bytes, false);
         String base64String = new String(base64Bytes);
-        base64String = "--BASE64--" + base64String + "--BASE64--";
+        //base64String = "--BASE64--" + base64String + "--BASE64--";
+        base64String = "--BASE64--" + base64String;
         try {
             //return URLEncoder.encode(base64String, "UTF-8");
             return new URLCodec("UTF-8").encode(base64String);
@@ -67,6 +72,14 @@ public class CryptoUtils {
 
     public static String md5Hex(byte[] bytes) {
         return DigestUtils.md5Hex(bytes);
+    }
+
+    public static byte[] sha1(byte[] bytes) {
+        return DigestUtils.sha1(bytes);
+    }
+
+    public static String sha1Hex(byte[] bytes) {
+        return DigestUtils.sha1Hex(bytes);
     }
 
     public static byte[] sha256(byte[] bytes) {

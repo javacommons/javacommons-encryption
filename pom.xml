@@ -50,6 +50,7 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- gpg -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
@@ -67,14 +68,6 @@
         </plugins>
     </build>
 
-    <!-- <distributionManagement>
-        <repository>
-            <id>sonatype-nexus-staging</id>
-            <name>Nexus Release Repository</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-        </repository>
-    </distributionManagement> -->
-        
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
