@@ -13,7 +13,7 @@ public class AlgorithmSpecParser {
     public final Cipher cipher;
     public final String secretKeySpec;
 
-    public AlgorithmSpecParser(String algorithmSpec) {
+    protected AlgorithmSpecParser(String algorithmSpec) {
         if (algorithmSpec.contains("::")) {
             String[] array = algorithmSpec.split("::");
             if (array.length != 2) {

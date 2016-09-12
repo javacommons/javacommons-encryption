@@ -74,7 +74,6 @@ public class CryptoUtils {
     }
 
     public static String sha256Hex(byte[] bytes) {
-        // 16進数文字列でMD5値を取得する
         return DigestUtils.sha256Hex(bytes);
     }
 

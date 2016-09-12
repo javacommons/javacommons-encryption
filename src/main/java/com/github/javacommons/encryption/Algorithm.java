@@ -6,21 +6,17 @@ package com.github.javacommons.encryption;
  */
 public class Algorithm {
 
-    final CryptoEngineImpl impl;
+    final AlgorithmEngine engine;
 
     /**
      * Crypto Engine encapsulation specified by algorithm, secret key, and
      * iteration times.
      */
-    public Algorithm(String algorithmSpec, byte[] secretKey, int times) {
+    protected Algorithm(String algorithmSpec, byte[] secretKey, int times) {
         if (times <= 0) {
             throw new IllegalStateException("Times must be greater than zero: " + times);
         }
-        //this.impl = getEngineImpl(algorithm, secretKey, times);
-        this.impl = new CryptoEngineImplJDK(algorithmSpec, secretKey, times);
-        //if (this.impl == null) {
-        //   throw new IllegalStateException("Algorithm not found: " + algorithm);
-        //}
+        this.engine = new CommonKeyAlgorithmEngine(algorithmSpec, secretKey, times);
     }
 
     /**
@@ -28,7 +24,7 @@ public class Algorithm {
      * データを秘密鍵で暗号化してバイト列で返す
      */
     public byte[] encryptToBytes(byte[] originalSource) {
-        return this.impl.encryptToBytes(originalSource);
+        return this.engine.encryptToBytes(originalSource);
     }
 
     /**
@@ -45,7 +41,7 @@ public class Algorithm {
      * 暗号化データを元のデータに復元する
      */
     public byte[] decryptFromBytes(byte[] encryptedBytes) {
-        return this.impl.decryptFromBytes(encryptedBytes);
+        return this.engine.decryptFromBytes(encryptedBytes);
     }
 
     /**
@@ -57,12 +53,4 @@ public class Algorithm {
         return decryptFromBytes(encryptBytes);
     }
 
-    /*
-    private CryptoEngineImpl getEngineImpl(String algorithm, byte[] secretKey, int times) {
-        CryptoEngineImpl impl;
-        impl = CryptoEngineImplBC.findAlgorithm(algorithm, secretKey, times);
-        if(impl != null) return impl;
-        impl = CryptoEngineImplJDK.findAlgorithm(algorithm, secretKey, times);
-        return impl;
-    }*/
 }

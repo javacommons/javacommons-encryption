@@ -1,50 +1,20 @@
 package com.github.javacommons.encryption;
 
-import java.security.InvalidKeyException;
 import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.security.Provider;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-public class CryptoEngineImplJDK extends CryptoEngineImpl {
+public class CommonKeyAlgorithmEngine extends AlgorithmEngine {
 
     final AlgorithmSpecParser parser;
-    //final Provider provider;
-    //final String cipherSpec;
-    //final String secretKeySpec;
     final byte[] secretKey;
     final int times;
 
-    protected CryptoEngineImplJDK(String algorithmSpec, byte[] secretKey, int times) {
+    protected CommonKeyAlgorithmEngine(String algorithmSpec, byte[] secretKey, int times) {
         this.parser = new AlgorithmSpecParser(algorithmSpec);
-        //this.provider = provider;
-        //this.cipherSpec = cipherSpec;
-        //this.secretKeySpec = secretKeySpec;
         this.secretKey = secretKey;
         this.times = times;
     }
-
-    /*
-    public static CryptoEngineImpl findAlgorithm(String algorithmSpec, byte[] secretKey, int times) {
-
-        
-        if ("JDK::AES".equalsIgnoreCase(algorithm)) {
-            return new CryptoEngineImplJDK(null, "AES", "AES", secretKey, times);
-        } else if ("BC::AES".equalsIgnoreCase(algorithm)) {
-            return new CryptoEngineImplJDK(new BouncyCastleProvider(), "AES", "AES", secretKey, times);
-        } else if ("BC::Blowfish".equalsIgnoreCase(algorithm)) {
-            return new CryptoEngineImplJDK(new BouncyCastleProvider(), "Blowfish", "Blowfish", secretKey, times);
-        } else {
-            return null;
-        }
-    }*/
 
     @Override
     public byte[] encryptToBytes(byte[] originalSource) {
