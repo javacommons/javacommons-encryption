@@ -30,12 +30,13 @@ public class GenerateMain {
 
         pw.println("package com.github.javacommons.encryption;");
         pw.println();
-        pw.println("import java.util.Arrays;");
-        pw.println("import java.util.Collections;");
-        pw.println("import java.util.List;");
-        pw.println();
+        //pw.println("import java.util.Arrays;");
+        //pw.println("import java.util.Collections;");
+        //pw.println("import java.util.List;");
+        //pw.println();
         pw.println("public class UnicodeRange {");
-        pw.println("    public static final List<String> JAPANESE_RANGE = Collections.unmodifiableList(Arrays.asList(");
+        //pw.println("    public static final List<String> JAPANESE_RANGE = Collections.unmodifiableList(Arrays.asList(");
+        pw.println("    protected static final String[] JAPANESE_RANGE = {");
 
         for (int i = 0; i < cpList.size(); i++) {
             int cp = cpList.get(i);
@@ -53,7 +54,7 @@ public class GenerateMain {
             }
             pw.println();
         }
-        pw.println("    ));");
+        pw.println("    };");
         pw.println("}");
         //SecureRandom sr = new SecureRandom();
         //for (int i = 0; i < 50; i++) {

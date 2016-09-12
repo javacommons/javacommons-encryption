@@ -108,15 +108,14 @@ public class CryptoUtils {
         return RandomStringUtils.randomAscii(count);
     }
 
-    /*
     public static String randomJapaneseString(int count) {
         String result = "";
         SecureRandom sr = new SecureRandom();
         for (int i = 0; i < count; i++) {
-            int index = sr.nextInt(UnicodeRange.JAPANESE_RANGE.size());
-            result += UnicodeRange.JAPANESE_RANGE.get(index);
+            int index = sr.nextInt(UnicodeRange.JAPANESE_RANGE.length);
+            result += UnicodeRange.JAPANESE_RANGE[index];
         }
         return result;
-    }*/
+    }
 
 }

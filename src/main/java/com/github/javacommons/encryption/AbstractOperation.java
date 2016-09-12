@@ -1,6 +1,6 @@
 package com.github.javacommons.encryption;
 
-public abstract class EngineCoreInterface {
+public abstract class AbstractOperation {
 
     /**
      * Returns encrypted byte array data of originalSource.

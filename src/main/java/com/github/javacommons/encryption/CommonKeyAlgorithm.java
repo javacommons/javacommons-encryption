@@ -15,7 +15,7 @@ import java.util.List;
 public class CommonKeyAlgorithm {
 
     final static int PAD_SIZE = 32;
-    final List<CommonKeyEngine> engineList = new ArrayList<>();
+    final List<AbstractOperation> engineList = new ArrayList<>();
 
     /**
      * Combination of multiple crypto engines.
@@ -30,8 +30,9 @@ public class CommonKeyAlgorithm {
      * @param secretKey
      * @param times
      */
-    public void addEngine(String engineSpec, byte[] secretKey, int times) {
-        CommonKeyEngine engine = new CommonKeyEngine(engineSpec, secretKey, times);
+    public void addOperation(String engineSpec, byte[] secretKey, int times) {
+        CommonKeyOperation engine = new CommonKeyOperation(engineSpec, secretKey, times);
+        /*
         byte[] data = CryptoUtils.randomAsciiBytes(64);
         data = engine.encryptToBytes(data);
         if (data == null) {
@@ -40,7 +41,22 @@ public class CommonKeyAlgorithm {
         data = engine.decryptFromBytes(data);
         if (data == null) {
             throw new IllegalStateException("Test decryption failed: " + engineSpec);
+        }*/
+        engineList.add(engine);
+    }
+
+    public void addOperation(String engineSpec, String hashSpec, String password, int times) {
+        CommonKeyOperation engine = new CommonKeyOperation(engineSpec, hashSpec, password, times);
+        /*
+        byte[] data = CryptoUtils.randomAsciiBytes(64);
+        data = engine.encryptToBytes(data);
+        if (data == null) {
+            throw new IllegalStateException("Test encryption failed: " + engineSpec);
         }
+        data = engine.decryptFromBytes(data);
+        if (data == null) {
+            throw new IllegalStateException("Test decryption failed: " + engineSpec);
+        }*/
         engineList.add(engine);
     }
 

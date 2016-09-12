@@ -2,7 +2,10 @@ package com.github.javacommons.encryption;
 
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
+import java.security.Provider;
+import java.util.Set;
 import org.apache.commons.lang.ArrayUtils;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class TestMain {
 
@@ -20,13 +23,29 @@ public class TestMain {
             //chain1.addCryptoEngine("Blowfish", sha256, 10);
             //chain1.addCryptoEngine("Rijndael", sha256, 10);
             //chain1.addCryptoEngine("jdk::aes", sha128, 10);
-            chain1.addEngine("bc::aes", sha128, 10);
-            chain1.addEngine("BC::Blowfish", sha128, 10);
+            chain1.addOperation("bc::aes", sha128, 10);
+            chain1.addOperation("BC::Blowfish", sha128, 10);
+            chain1.addOperation("aes", "md5", "あいうえお", 10);
+            chain1.addOperation("aes", "128bit", "かきくけこ", 10);
+            chain1.addOperation("aes", "hex", "12345678901234567890123456789012", 10);
+            chain1.addOperation("bc::Twofish", "128bit", "かきくけこ", 10);
+            //chain1.addOperation("aes", "160bit", "かきくけこ", 10);
+            //chain1.addOperation("bc::aes", "256bit", "かきくけこ", 10);
+            //chain1.addOperation("bc::blowfish", "256bit", "かきくけこ", 10);
+            //chain1.addOperation("bc::Rijndael", "256bit", "かきくけこ", 10);
+            //chain1.addOperation("bc::Rijndael", "160bit", "かきくけこ", 10);
+            //chain1.addOperation("bc::AES/CBC/PKCS5Padding", "256bit", "かきくけこ", 10);
+            //chain1.addOperation("bc::Twofish", "256bit", "かきくけこ", 10);
+            
+            
+
             String base64 = chain1.encryptToBase64(randomBytes);
             System.out.println(base64);
             byte[] result0 = chain0.decryptFromBase64(base64);
             System.out.println("" + result0);
-            if(result0 != null) throw new IllegalStateException();
+            if (result0 != null) {
+                throw new IllegalStateException();
+            }
             byte[] result1 = chain1.decryptFromBase64(base64);
             System.out.println(CryptoUtils.md5Hex(result1));
             ////System.out.println(result.equals(randomBytes));
@@ -38,10 +57,19 @@ public class TestMain {
     }
 
     public static void main(String[] args) throws UnsupportedEncodingException, FileNotFoundException {
-        //String jap = CryptoUtils.randomJapaneseString(16);
-        //System.out.println(jap);
+        BouncyCastleProvider bcp = new BouncyCastleProvider();
+        Set<Provider.Service> services = bcp.getServices();
+        for (Provider.Service service : services) {
+            System.out.println(service.getAlgorithm());
+        }
+        for (int i = 0; i < 5; i++) {
+            String jap = CryptoUtils.randomJapaneseString(16);
+            System.out.println(jap);
+        }
         //GenerateMain.main(new String[0]);
-        //if(true) return;
+        if (false) {
+            return;
+        }
         byte[] key = "abc".getBytes();
         byte[] sha256 = CryptoUtils.sha256(key);
         //System.out.println(sha256.length);
@@ -52,7 +80,7 @@ public class TestMain {
         //byte[] data = "1234567890123456".getBytes();
         CommonKeyAlgorithm en = new CommonKeyAlgorithm();
         //en.addCryptoEngine("Blowfish", sha256, 10);
-        en.addEngine("AES", sha256, 1);
+        en.addOperation("AES", sha256, 1);
         byte[] data = "abcテスト".getBytes();
         data = ("|" + CryptoUtils.randomAsciiString(1024)).getBytes();
         byte[] enc = en.encryptToBytes(data);
