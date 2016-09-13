@@ -2,13 +2,9 @@ package com.github.javacommons.encryption;
 
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
-import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.lang.RandomStringUtils;
 
 public class CryptoUtils {

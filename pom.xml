@@ -2,9 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.javacommons%22%20AND%20a%3A%22javacommons-encryption%22 -->
     <groupId>com.github.javacommons</groupId>
     <artifactId>javacommons-encryption</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4</version>
     <name>javacommons-encryption</name>
 
     <packaging>jar</packaging>
@@ -55,6 +56,18 @@
 
     <build>
         <plugins>
+            <!-- main class -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.github.javacommons.encryption.TestMain</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
             <!-- generate source -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -108,10 +121,33 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- one-jar -->
+            <!-- <plugin>
+                <groupId>com.jolira</groupId>
+                <artifactId>onejar-maven-plugin</artifactId>
+                <version>1.4.4</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>one-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin> -->
         </plugins>
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+        </dependency>
+        <!-- <dependency>
+            <groupId>org.apache.maven.surefire</groupId>
+            <artifactId>surefire-junit47</artifactId>
+            <version>2.12</version>
+        </dependency> -->
         <!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
         <dependency>
             <groupId>commons-codec</groupId>
@@ -135,6 +171,12 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.8.2</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/de.undercouch/bson4jackson -->
+        <dependency>
+            <groupId>de.undercouch</groupId>
+            <artifactId>bson4jackson</artifactId>
+            <version>2.7.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.gnu/gnu-crypto -->
         <!-- <dependency>

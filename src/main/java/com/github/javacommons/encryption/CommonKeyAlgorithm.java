@@ -3,11 +3,15 @@ package com.github.javacommons.encryption;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import de.undercouch.bson4jackson.BsonFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.lang.ArrayUtils;
 
 /**
  * Combination of multiple crypto engines.
@@ -31,33 +35,13 @@ public class CommonKeyAlgorithm {
      * @param times
      */
     public void addOperation(String engineSpec, byte[] secretKey, int times) {
-        CommonKeyOperation engine = new CommonKeyOperation(engineSpec, secretKey, times);
-        /*
-        byte[] data = CryptoUtils.randomAsciiBytes(64);
-        data = engine.encryptToBytes(data);
-        if (data == null) {
-            throw new IllegalStateException("Test encryption failed: " + engineSpec);
-        }
-        data = engine.decryptFromBytes(data);
-        if (data == null) {
-            throw new IllegalStateException("Test decryption failed: " + engineSpec);
-        }*/
+        AbstractOperation engine = new CommonKeyOperation(engineSpec, secretKey, times);
         engineList.add(engine);
     }
 
     public void addOperation(String engineSpec, String hashSpec, String password, int times) {
-        CommonKeyOperation engine = new CommonKeyOperation(engineSpec, hashSpec, password, times);
-        /*
-        byte[] data = CryptoUtils.randomAsciiBytes(64);
-        data = engine.encryptToBytes(data);
-        if (data == null) {
-            throw new IllegalStateException("Test encryption failed: " + engineSpec);
-        }
-        data = engine.decryptFromBytes(data);
-        if (data == null) {
-            throw new IllegalStateException("Test decryption failed: " + engineSpec);
-        }*/
-        engineList.add(engine);
+        AbstractOperation operation = new CommonKeyOperation(engineSpec, hashSpec, password, times);
+        engineList.add(operation);
     }
 
     /**
@@ -75,6 +59,20 @@ public class CommonKeyAlgorithm {
      * Returns encrypted byte array data of an Object. オブジェクトを秘密鍵で暗号化してバイト列で返す
      */
     public byte[] objectToBytes(Object o) {
+        ObjectMapper mapper = new ObjectMapper(new BsonFactory());
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            mapper.writeValue(baos, o);
+        } catch (JsonProcessingException ex) {
+            return null;
+        } catch (IOException ex) {
+            return null;
+        }
+        byte[] originalSource = baos.toByteArray();
+        return encryptToBytes(originalSource);
+    }
+    /*
+    public byte[] objectToBytes(Object o) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
         String json;
@@ -86,6 +84,7 @@ public class CommonKeyAlgorithm {
         byte[] originalSource = json.getBytes();
         return encryptToBytes(originalSource);
     }
+    */
 
     /**
      * Returns encrypted byte array data of originalSource (as Base64 String).
@@ -124,13 +123,27 @@ public class CommonKeyAlgorithm {
         if (bytes == null) {
             return null;
         }
+        ObjectMapper mapper = new ObjectMapper(new BsonFactory());
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        try {
+            return mapper.readValue(bais, valueType);
+        } catch (IOException ex) {
+            return null;
+        }
+    }
+    /*
+    public <T extends Object> T objectFromBytes(byte[] encryptedBytes, Class<T> valueType) {
+        byte[] bytes = decryptFromBytes(encryptedBytes);
+        if (bytes == null) {
+            return null;
+        }
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.readValue(bytes, valueType);
         } catch (IOException ex) {
             return null;
         }
-    }
+    }*/
 
     /**
      * Returns decrypted byte array data of encryptedBase64String.
@@ -154,6 +167,9 @@ public class CommonKeyAlgorithm {
         return objectFromBytes(encryptBytes, valueType);
     }
 
+    private byte[] _appendPadding(byte[] bytes) { return bytes; }
+    private byte[] _removePadding(byte[] bytes) { return bytes; }
+    /*
     private final byte[] md5Head = "--MD5=".getBytes();
     private final byte[] sha1Head = "--SHA1=".getBytes();
     private final byte[] tail = "--".getBytes();
@@ -201,14 +217,14 @@ public class CommonKeyAlgorithm {
         if (bais.read(md5HexBytes, 0, md5HexBytes.length) != md5HexBytes.length) {
             return null;
         }
-        String md5Hex = new String(md5HexBytes);
+        ////String md5Hex = new String(md5HexBytes);
         // SHA1
         bais.skip(sha1Head.length);
         byte[] sha1HexBytes = new byte[40];
         if (bais.read(sha1HexBytes, 0, sha1HexBytes.length) != sha1HexBytes.length) {
             return null;
         }
-        String sha1Hex = new String(sha1HexBytes);
+        ////String sha1Hex = new String(sha1HexBytes);
         // TAIL
         bais.skip(tail.length);
         // Check Digests
@@ -216,15 +232,16 @@ public class CommonKeyAlgorithm {
         if (bais.read(rest, 0, rest.length) != rest.length) {
             return null;
         }
-        String restMd5Hex = CryptoUtils.md5Hex(rest);
-        if (!restMd5Hex.equals(md5Hex)) {
+        byte[] restMd5HexBytes = CryptoUtils.md5Hex(rest).getBytes();
+        if (!ArrayUtils.isEquals(restMd5HexBytes, md5HexBytes)) {
             return null;
         }
-        String restSha1Hex = CryptoUtils.sha1Hex(rest);
-        if (!restSha1Hex.equals(sha1Hex)) {
+        byte[] restSha1HexBytes = CryptoUtils.sha1Hex(rest).getBytes();
+        if (!ArrayUtils.isEquals(restSha1HexBytes, sha1HexBytes)) {
             return null;
         }
         return rest;
     }
+    */
 
 }

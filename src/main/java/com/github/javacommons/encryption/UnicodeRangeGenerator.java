@@ -6,11 +6,10 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GenerateMain {
+public class UnicodeRangeGenerator {
 
     public static void main(String[] args) throws UnsupportedEncodingException, FileNotFoundException {
         new File("/home/javacommons").mkdirs();
