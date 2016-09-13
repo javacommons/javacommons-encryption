@@ -3,6 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <!-- http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.javacommons%22%20AND%20a%3A%22javacommons-encryption%22 -->
+    <!-- https://jitpack.io/#javacommons/javacommons-encryption -->
     <groupId>com.github.javacommons</groupId>
     <artifactId>javacommons-encryption</artifactId>
     <version>0.0.4</version>
@@ -184,5 +185,24 @@
             <artifactId>gnu-crypto</artifactId>
             <version>2.0.1</version>
         </dependency> -->
+        <!-- https://mvnrepository.com/artifact/net.sf.sevenzipjbinding/sevenzipjbinding -->
+        <dependency>
+            <groupId>net.sf.sevenzipjbinding</groupId>
+            <artifactId>sevenzipjbinding</artifactId>
+            <version>9.20-2.00beta</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/net.sf.sevenzipjbinding/sevenzipjbinding-all-platforms -->
+        <dependency>
+            <groupId>net.sf.sevenzipjbinding</groupId>
+            <artifactId>sevenzipjbinding-all-platforms</artifactId>
+            <version>9.20-2.00beta</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/net.lingala.zip4j/zip4j -->
+        <!-- [article] http://qiita.com/fukuramikake/items/43a1453175ea2bd93097 -->
+        <dependency>
+            <groupId>net.lingala.zip4j</groupId>
+            <artifactId>zip4j</artifactId>
+            <version>1.3.2</version>
+        </dependency>
     </dependencies>    
 </project>
