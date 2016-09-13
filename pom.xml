@@ -58,7 +58,7 @@
     <build>
         <plugins>
             <!-- main class -->
-            <plugin>
+            <!-- <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
@@ -68,7 +68,7 @@
                         </manifest>
                     </archive>
                 </configuration>
-            </plugin>
+            </plugin> -->
             <!-- generate source -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

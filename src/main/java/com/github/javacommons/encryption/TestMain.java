@@ -1,9 +1,25 @@
 package com.github.javacommons.encryption;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import java.io.BufferedOutputStream;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
-import org.apache.commons.lang.ArrayUtils;
+
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.util.Zip4jConstants;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
+import java.util.Scanner;
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.io.ZipOutputStream;
+import net.lingala.zip4j.model.ZipModel;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
 class POJO {
@@ -12,59 +28,100 @@ class POJO {
 }
 
 class POJO1 extends POJO {
+
     public int i = 1234;
 }
 
 public class TestMain {
 
-    public static void randomTest() {
-        for (int i = 9990; i < 10000; i++) {
-            //String randomString = CryptoUtils.randomAsciiString(i);
-            //byte[] randomBytes = randomString.getBytes();
-            byte[] randomBytes = CryptoUtils.randomBinaryBytes(i);
-            System.out.println(CryptoUtils.md5Hex(randomBytes));
-            byte[] key = CryptoUtils.randomAsciiBytes(i);
-            byte[] sha256 = CryptoUtils.sha256(key);
-            byte[] sha128 = CryptoUtils.randomAsciiBytes(16);
-            CommonKeyAlgorithm chain0 = new CommonKeyAlgorithm();
-            CommonKeyAlgorithm chain1 = new CommonKeyAlgorithm();
-            //chain1.addCryptoEngine("Blowfish", sha256, 10);
-            //chain1.addCryptoEngine("Rijndael", sha256, 10);
-            //chain1.addCryptoEngine("jdk::aes", sha128, 10);
-            chain1.addOperation("bc::aes", sha128, 10);
-            chain1.addOperation("BC::Blowfish", sha128, 10);
-            chain1.addOperation("aes", "md5", "あいうえお", 10);
-            chain1.addOperation("aes", "128bit", "かきくけこ", 10);
-            chain1.addOperation("aes", "hex", "12345678901234567890123456789012", 10);
-            chain1.addOperation("bc::Twofish", "128bit", "かきくけこ", 10);
-            //chain1.addOperation("aes", "160bit", "かきくけこ", 10);
-            //chain1.addOperation("bc::aes", "256bit", "かきくけこ", 10);
-            //chain1.addOperation("bc::blowfish", "256bit", "かきくけこ", 10);
-            //chain1.addOperation("bc::Rijndael", "256bit", "かきくけこ", 10);
-            //chain1.addOperation("bc::Rijndael", "160bit", "かきくけこ", 10);
-            //chain1.addOperation("bc::AES/CBC/PKCS5Padding", "256bit", "かきくけこ", 10);
-            //chain1.addOperation("bc::Twofish", "256bit", "かきくけこ", 10);
-            //chain1.addOperation("GNU-CRYPTO::aes", "256bit", "かきくけこ", 10);
-
-            String base64 = chain1.encryptToBase64(randomBytes);
-            System.out.println(base64);
-            /*
-            byte[] result0 = chain0.decryptFromBase64(base64);
-            System.out.println("" + result0);
-            if (result0 != null) {
-                throw new IllegalStateException();
-            }*/
-            byte[] result1 = chain1.decryptFromBase64(base64);
-            System.out.println(CryptoUtils.md5Hex(result1));
-            ////System.out.println(result.equals(randomBytes));
-            System.out.println(ArrayUtils.isEquals(result1, randomBytes));
-            if (!ArrayUtils.isEquals(result1, randomBytes)) {
-                throw new IllegalStateException();
-            }
+    public static void hwTest() throws SocketException, IOException {
+        Enumeration<NetworkInterface> nic = NetworkInterface.getNetworkInterfaces();
+        for (; nic.hasMoreElements();) {
+            NetworkInterface n = nic.nextElement();
+            System.out.println(n.getName() + " : " + java.util.Arrays.toString(n.getHardwareAddress()));
         }
+        // wmic command for diskdrive id: wmic DISKDRIVE GET SerialNumber
+        // wmic command for cpu id : wmic cpu get ProcessorId
+        // wmic csproduct get uuid
+        //Process process = Runtime.getRuntime().exec(new String[]{"wmic", "bios", "get", "serialnumber"});
+        Process process = Runtime.getRuntime().exec(new String[]{"wmic", "csproduct", "get", "uuid"});
+        process.getOutputStream().close();
+        Scanner sc = new Scanner(process.getInputStream());
+        String property = sc.next();
+        String serial = sc.next();
+        System.out.println(property + ": " + serial);
     }
 
-    public static void main(String[] args) throws UnsupportedEncodingException, FileNotFoundException {
+    public static void zipTest1() throws IOException, ZipException {
+
+        ZipModel model = new ZipModel();
+        model.setFileNameCharset("UTF-8");
+
+        ZipParameters parameters = new ZipParameters();
+        parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+        parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
+        parameters.setEncryptFiles(true);
+        parameters.setEncryptionMethod(Zip4jConstants.ENC_METHOD_STANDARD);
+        parameters.setAesKeyStrength(Zip4jConstants.AES_STRENGTH_256);
+        parameters.setPassword("test2");
+        parameters.setSourceExternalStream(true);
+        parameters.setFileNameInZip("aaa/bbb.txt");
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+            final String fileName = "xyz/abcd漢字.txt";
+            final byte[] input = "testテスト".getBytes();
+            File file = new File(fileName) {
+                @Override
+                public boolean exists() {
+                    return true;
+                }
+
+                @Override
+                public boolean isDirectory() {
+                    return false;
+                }
+
+                @Override
+                public String getAbsolutePath() {
+                    return fileName;
+                }
+
+                @Override
+                public boolean isHidden() {
+                    return false;
+                }
+
+                @Override
+                public long lastModified() {
+                    return System.currentTimeMillis();
+                }
+
+                @Override
+                public long length() {
+                    return input.length;
+                }
+            };
+
+            zipOutputStream.putNextEntry(file, parameters);
+            zipOutputStream.write(input);
+            zipOutputStream.closeEntry();
+            zipOutputStream.finish();
+        }
+
+        byte[] output = byteArrayOutputStream.toByteArray();
+
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream("/home/javacommons/output.zip"));
+        bos.write(output);
+        bos.close();
+    }
+
+    public static void zipTest2() throws IOException, ZipException {
+        ZipFile zf = new ZipFile("/home/javacommons/output.zip");
+        zf.removeFile("aaa/bbb.txt");
+    }
+
+    public static void main(String[] args) throws UnsupportedEncodingException, FileNotFoundException, IOException, ZipException {
         //BouncyCastleProvider bcp = new BouncyCastleProvider();
         /*
         GnuCrypto bcp = new GnuCrypto();
@@ -110,7 +167,65 @@ public class TestMain {
         System.out.println(y);
         System.out.println("(x == y)" + (x.dbl == y.dbl));
         ////System.out.println(RandomStringUtils.randomAscii(16));
-        randomTest();
+        zipTest1();
+        zipTest2();
+        hwTest();
     }
 
+}
+
+class Zip {
+
+    public static byte[] encryptZip(final String fileName, final byte[] input, String password) throws IOException, ZipException {
+        ZipParameters parameters = new ZipParameters();
+        parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+        parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
+        parameters.setEncryptFiles(true);
+        parameters.setEncryptionMethod(Zip4jConstants.ENC_METHOD_STANDARD);
+        parameters.setAesKeyStrength(Zip4jConstants.AES_STRENGTH_256);
+        parameters.setPassword(password);
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+            File file = new File(fileName) {
+                @Override
+                public boolean exists() {
+                    return true;
+                }
+
+                @Override
+                public boolean isDirectory() {
+                    return false;
+                }
+
+                @Override
+                public String getAbsolutePath() {
+                    return fileName;
+                }
+
+                @Override
+                public boolean isHidden() {
+                    return false;
+                }
+
+                @Override
+                public long lastModified() {
+                    return System.currentTimeMillis();
+                }
+
+                @Override
+                public long length() {
+                    return input.length;
+                }
+            };
+
+            zipOutputStream.putNextEntry(file, parameters);
+            zipOutputStream.write(input);
+            zipOutputStream.closeEntry();
+            zipOutputStream.finish();
+        }
+
+        return byteArrayOutputStream.toByteArray();
+
+    }
 }
