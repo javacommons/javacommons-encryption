@@ -1,1 +1,1 @@
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.javacommons/javacommons-encryption.svg)]()
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.javacommons/javacommons-encryption.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.javacommons%22%20AND%20a%3A%22javacommons-encryption%22)
