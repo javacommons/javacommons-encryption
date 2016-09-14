@@ -1,7 +1,11 @@
 package com.github.javacommons.encryption;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import de.undercouch.bson4jackson.BsonFactory;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 
@@ -20,9 +24,9 @@ import java.util.Scanner;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.io.ZipOutputStream;
 import net.lingala.zip4j.model.ZipModel;
+import org.apache.commons.lang.ArrayUtils;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
-class POJO {
+class POJO extends Encryptable {
 
     public double dbl = 0;
 }
@@ -30,9 +34,52 @@ class POJO {
 class POJO1 extends POJO {
 
     public int i = 1234;
+    public byte[] bytes = null;
 }
 
 public class TestMain {
+
+    public static boolean doSerialize(StoreBytes o) {
+        //ObjectMapper mapper = new ObjectMapper(new BsonFactory());
+        ObjectMapper mapper = new ObjectMapper();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            mapper.writeValue(baos, o);
+        } catch (JsonProcessingException ex) {
+            return false;
+        } catch (IOException ex) {
+            return false;
+        }
+        byte[] originalSource = baos.toByteArray();
+        System.out.println(new String(originalSource));
+        //ObjectMapper mapper = new ObjectMapper(new BsonFactory());
+        ByteArrayInputStream bais = new ByteArrayInputStream(originalSource);
+        StoreBytes o2;
+        try {
+            o2 = mapper.readValue(bais, StoreBytes.class);
+            return ArrayUtils.isEquals(o.data(), o2.data());
+        } catch (IOException ex) {
+            System.out.println("IOException");
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    public static void serializeTest() {
+        Object bo = new byte[256];
+        StoreBytes o = new StoreBytes("abc漢字".getBytes());
+        if (!doSerialize(o)) {
+            throw new IllegalStateException();
+        }
+        for (int i = 0; i < 50; i++) {
+            StoreBytes ox = new StoreBytes(CryptoUtils.randomJapaneseString(20).getBytes());
+            System.out.println(new String(ox.data()));
+            if (!doSerialize(ox)) {
+                throw new IllegalStateException();
+            }
+        }
+
+    }
 
     public static void hwTest() throws SocketException, IOException {
         Enumeration<NetworkInterface> nic = NetworkInterface.getNetworkInterfaces();
@@ -122,6 +169,7 @@ public class TestMain {
     }
 
     public static void main(String[] args) throws UnsupportedEncodingException, FileNotFoundException, IOException, ZipException {
+        serializeTest();
         //BouncyCastleProvider bcp = new BouncyCastleProvider();
         /*
         GnuCrypto bcp = new GnuCrypto();
@@ -147,22 +195,22 @@ public class TestMain {
         //byte[] data = "1234567890123456".getBytes();
         CommonKeyAlgorithm en = new CommonKeyAlgorithm();
         //en.addCryptoEngine("Blowfish", sha256, 10);
-        en.addOperation("AES", sha256, 1);
+        //en.addOperation("AES", sha256, 1);
         byte[] data = "abc".getBytes();
-        data = ("|" + CryptoUtils.randomAsciiString(1024)).getBytes();
+        data = (CryptoUtils.randomAsciiString(10)).getBytes();
         byte[] enc = en.encryptToBytes(data);
         //String enc2 = en.encryptToBase64(data);
         //System.out.println("enc2=" + enc2);
         //System.out.println(enc.length);
-        byte[] dec = en.decryptFromBytes(enc);
+        byte[] dec = (byte[]) en.decryptFromBytes(enc);
         System.out.println(new String(dec));
 
         //Double x = 1.23456789;
         POJO x = new POJO1();
         x.dbl = 1.23456789;
-        String x64 = en.objectToBase64(x);
+        String x64 = en.encryptToBase64(x);
         System.out.println("x64=" + x64);
-        POJO y = en.objectFromBase64(x64, POJO.class);
+        POJO y = (POJO)en.decryptFromBase64(x64);
         System.out.println(y.getClass().getName());
         System.out.println(y);
         System.out.println("(x == y)" + (x.dbl == y.dbl));

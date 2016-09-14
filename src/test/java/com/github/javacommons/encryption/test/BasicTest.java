@@ -46,7 +46,7 @@ public class BasicTest {
             if (result0 != null) {
                 throw new IllegalStateException();
             }*/
-            byte[] result1 = chain1.decryptFromBase64(base64);
+            byte[] result1 = (byte[])chain1.decryptFromBase64(base64);
             System.out.println(CryptoUtils.md5Hex(result1));
             ////System.out.println(result.equals(randomBytes));
             System.out.println(ArrayUtils.isEquals(result1, randomBytes));
