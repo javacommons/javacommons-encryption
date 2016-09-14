@@ -64,23 +64,6 @@ public class CommonKeyAlgorithm {
     }
 
     /**
-     * Returns encrypted byte array data of an Object. オブジェクトを秘密鍵で暗号化してバイト列で返す
-     */
-    /*
-    public byte[] objectToBytes(Object o) {
-        ObjectMapper mapper = new ObjectMapper(new BsonFactory());
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            mapper.writeValue(baos, o);
-        } catch (JsonProcessingException ex) {
-            return null;
-        } catch (IOException ex) {
-            return null;
-        }
-        byte[] originalSource = baos.toByteArray();
-        return encryptToBytes(originalSource);
-    }*/
-    /**
      * Returns encrypted byte array data of originalSource (as Base64 String).
      * データを秘密鍵で暗号化してBase64した文字列で返す
      */
@@ -99,15 +82,6 @@ public class CommonKeyAlgorithm {
     }
 
     /**
-     * Returns encrypted Base64 string of an Object.
-     * オブジェクトを秘密鍵で暗号化してBase64した文字列で返す
-     */
-    /*
-    public String objectToBase64(Object o) {
-        byte[] encryptBytes = objectToBytes(o);
-        return CryptoUtils.base64Encode(encryptBytes);
-    }*/
-    /**
      * Returns decrypted byte array data of encryptedBytes. 暗号化データを元のデータに復元する
      */
     public Object decryptFromBytes(byte[] encryptedBytes) {
@@ -119,23 +93,6 @@ public class CommonKeyAlgorithm {
     }
 
     /**
-     * Restore an Object from encrypted byte array. 暗号化データを元のオブジェクトに復元する
-     */
-    /*
-    public <T extends Object> T objectFromBytes(byte[] encryptedBytes, Class<T> valueType) {
-        byte[] bytes = decryptFromBytes(encryptedBytes);
-        if (bytes == null) {
-            return null;
-        }
-        ObjectMapper mapper = new ObjectMapper(new BsonFactory());
-        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-        try {
-            return mapper.readValue(bais, valueType);
-        } catch (IOException ex) {
-            return null;
-        }
-    }*/
-    /**
      * Returns decrypted byte array data of encryptedBase64String.
      * Base64された暗号化データを元のデータに復元する
      */
@@ -146,17 +103,6 @@ public class CommonKeyAlgorithm {
         return decryptFromBytes(encryptBytes);
     }
 
-    /**
-     * Restore an Object from encrypted Base64 string.
-     * Base64された暗号化データを元のデータに復元する
-     */
-    /*
-    public <T extends Object> T objectFromBase64(String encryptedBase64String, Class<T> valueType) {
-        //Base64 base64 = new Base64(true); // (urlSafe)
-        //byte[] encryptBytes = base64.decodeBase64(encryptedBase64String);
-        byte[] encryptBytes = CryptoUtils.base64Decode(encryptedBase64String);
-        return objectFromBytes(encryptBytes, valueType);
-    }*/
     private byte[] _encryptableToBytes(Encryptable e) {
         if (e == null) {
             return null;
