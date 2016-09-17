@@ -31,11 +31,11 @@ public final class CryptoUtils {
         return byteBuf.array();
     }
 
-    public static String base64Encode(byte[] bytes) {
+    public static String base64Encode(byte[] bytes, boolean urlSafe) {
         if (bytes == null) {
             return null;
         }
-        Base64 base64 = new Base64(-1, "\n".getBytes(), true); // no newline & urlSafe
+        Base64 base64 = new Base64(-1, "\n".getBytes(), urlSafe); // no newline
         String base64String = base64.encodeAsString(bytes);
         return base64String;
         /*

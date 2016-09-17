@@ -69,7 +69,7 @@ public final class CommonKeyAlgorithm {
      */
     public String encryptToBase64(byte[] originalSource) {
         byte[] encryptBytes = encryptToBytes(originalSource);
-        return CryptoUtils.base64Encode(encryptBytes);
+        return CryptoUtils.base64Encode(encryptBytes, true);
     }
 
     /**
@@ -78,7 +78,7 @@ public final class CommonKeyAlgorithm {
      */
     public String encryptToBase64(Encryptable originalSource) {
         byte[] encryptBytes = encryptToBytes(originalSource);
-        return CryptoUtils.base64Encode(encryptBytes);
+        return CryptoUtils.base64Encode(encryptBytes, true);
     }
 
     /**
