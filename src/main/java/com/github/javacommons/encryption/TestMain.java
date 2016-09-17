@@ -1,9 +1,7 @@
 package com.github.javacommons.encryption;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.undercouch.bson4jackson.BsonFactory;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
@@ -21,9 +19,12 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.Scanner;
-import net.lingala.zip4j.core.ZipFile;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import net.lingala.zip4j.io.ZipOutputStream;
 import net.lingala.zip4j.model.ZipModel;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 
 class POJO extends Encryptable {
@@ -107,10 +108,10 @@ public class TestMain {
         ZipParameters parameters = new ZipParameters();
         parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
         parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
-        parameters.setEncryptFiles(true);
-        parameters.setEncryptionMethod(Zip4jConstants.ENC_METHOD_STANDARD);
-        parameters.setAesKeyStrength(Zip4jConstants.AES_STRENGTH_256);
-        parameters.setPassword("test2");
+        //parameters.setEncryptFiles(true);
+        //parameters.setEncryptionMethod(Zip4jConstants.ENC_METHOD_STANDARD);
+        //parameters.setAesKeyStrength(Zip4jConstants.AES_STRENGTH_256);
+        //parameters.setPassword("test2");
         parameters.setSourceExternalStream(true);
         parameters.setFileNameInZip("aaa/bbb.txt");
 
@@ -158,14 +159,28 @@ public class TestMain {
 
         byte[] output = byteArrayOutputStream.toByteArray();
 
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream("/home/javacommons/output.zip"));
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream("target/sample.zip"));
         bos.write(output);
         bos.close();
     }
 
     public static void zipTest2() throws IOException, ZipException {
-        ZipFile zf = new ZipFile("/home/javacommons/output.zip");
-        zf.removeFile("aaa/bbb.txt");
+        //ZipFile zf = new ZipFile("/home/javacommons/output.zip");
+        //zf.removeFile("aaa/bbb.txt");
+        //BufferedInputStream bis = new BufferedInputStream(new FileInputStream("target/sample.zip"));
+        byte[] input = FileUtils.readFileToByteArray(new File("target/sample.zip"));
+        ByteArrayInputStream bais = new ByteArrayInputStream(input);
+        //ZipFile zf = new ZipFile
+        //ZipInputStream zis = new ZipInputStream(bais);
+        ZipInputStream zis = new ZipInputStream(bais);
+        ZipEntry ze;
+        while ((ze = zis.getNextEntry()) != null) {
+            System.out.printf("ze.getName()=%s(%d)\n", ze.getName(), ze.getSize());
+            if(ze.isDirectory()) continue;
+            byte[] content = IOUtils.toByteArray(zis);
+            System.out.println(content.length);
+            System.out.println(new String(content));
+        }
     }
 
     public static void main(String[] args) throws UnsupportedEncodingException, FileNotFoundException, IOException, ZipException {
@@ -210,7 +225,7 @@ public class TestMain {
         x.dbl = 1.23456789;
         String x64 = en.encryptToBase64(x);
         System.out.println("x64=" + x64);
-        POJO y = (POJO)en.decryptFromBase64(x64);
+        POJO y = (POJO) en.decryptFromBase64(x64);
         System.out.println(y.getClass().getName());
         System.out.println(y);
         System.out.println("(x == y)" + (x.dbl == y.dbl));

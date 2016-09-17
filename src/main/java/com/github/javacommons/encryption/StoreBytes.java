@@ -1,6 +1,6 @@
 package com.github.javacommons.encryption;
 
-public class StoreBytes extends Encryptable {
+final class StoreBytes extends Encryptable {
 
     public byte[] bytes = null;
     

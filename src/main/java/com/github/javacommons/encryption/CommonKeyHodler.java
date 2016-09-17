@@ -4,7 +4,7 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 
-public class CommonKeyHodler {
+public final class CommonKeyHodler {
 
     final byte[] bytes;
     final String hashType;

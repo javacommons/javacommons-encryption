@@ -13,7 +13,7 @@ import org.apache.commons.lang.ArrayUtils;
 /**
  * Combination of multiple crypto engines.
  */
-public class CommonKeyAlgorithm {
+public final class CommonKeyAlgorithm {
 
     //final static int PAD_SIZE = 32;
     final List<AbstractOperation> engineList = new ArrayList<>();

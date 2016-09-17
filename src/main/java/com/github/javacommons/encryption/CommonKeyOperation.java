@@ -4,7 +4,7 @@ import java.security.Key;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-public class CommonKeyOperation extends AbstractOperation {
+public final class CommonKeyOperation extends AbstractOperation {
 
     final EngineSpecParser parser;
     final CommonKeyHodler keyHolder;

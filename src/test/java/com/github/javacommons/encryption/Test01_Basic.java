@@ -1,4 +1,4 @@
-package com.github.javacommons.encryption.test;
+package com.github.javacommons.encryption;
 
 import com.github.javacommons.encryption.CommonKeyAlgorithm;
 import com.github.javacommons.encryption.CryptoUtils;
@@ -6,11 +6,12 @@ import org.apache.commons.lang.ArrayUtils;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class BasicTest {
+public class Test01_Basic {
 
     @Test
     public void testRandom1() {
-        for (int i = 9990; i < 10000; i++) {
+        //for (int i = 9990; i < 10000; i++) {
+        for (int i = 10; i < 11; i++) {
             //String randomString = CryptoUtils.randomAsciiString(i);
             //byte[] randomBytes = randomString.getBytes();
             byte[] randomBytes = CryptoUtils.randomBinaryBytes(i);

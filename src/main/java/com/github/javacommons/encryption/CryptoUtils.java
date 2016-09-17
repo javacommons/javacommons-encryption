@@ -1,13 +1,17 @@
 package com.github.javacommons.encryption;
 
+import com.google.common.base.Preconditions;
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.RandomStringUtils;
 
-public class CryptoUtils {
+public final class CryptoUtils {
 
     public static void assertBoolean(boolean b) {
         if (!b) {
@@ -61,8 +65,19 @@ public class CryptoUtils {
         }*/
     }
 
-    public static String hex(byte[] bytes) {
-        return Hex.encodeHexString(bytes);
+    public static String bytes2Hex(byte[] bytes) {
+        Preconditions.checkNotNull(bytes);
+        //return Hex.encodeHexString(bytes);
+        return new String(Hex.encodeHex(bytes));
+    }
+
+    public static byte[] hex2Bytes(String hex) {
+        Preconditions.checkNotNull(hex);
+        try {
+            return Hex.decodeHex(hex.toCharArray());
+        } catch (DecoderException ex) {
+            return null;
+        }
     }
 
     public static byte[] md5(byte[] bytes) {

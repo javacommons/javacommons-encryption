@@ -1,10 +1,11 @@
 package com.github.javacommons.encryption;
 
+import com.google.common.base.Preconditions;
 import java.security.Provider;
 import java.security.Security;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-public class EngineSpecParser {
+public final class EngineSpecParser {
 
     public final String providerName;
     public final Provider provider;
@@ -13,6 +14,7 @@ public class EngineSpecParser {
     public final String secretKeySpec;
 
     protected EngineSpecParser(String algorithmSpec) {
+        Preconditions.checkNotNull(algorithmSpec, "[algorithmSpec]");
         if (algorithmSpec.contains("::")) {
             String[] array = algorithmSpec.split("::");
             if (array.length != 2) {

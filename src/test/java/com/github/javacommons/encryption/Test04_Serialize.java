@@ -1,4 +1,4 @@
-package com.github.javacommons.encryption.test;
+package com.github.javacommons.encryption;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -9,6 +9,7 @@ import java.io.Serializable;
 import static org.hamcrest.core.Is.is;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.hamcrest.core.Is.is;
 
 class Person implements Serializable {
     public String firstName;
@@ -22,7 +23,7 @@ class Hobby
     public String hobby;
 }
 
-public class TestSerialize {
+public class Test04_Serialize {
 
     @Test
     public void test1() {

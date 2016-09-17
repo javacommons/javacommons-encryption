@@ -1,4 +1,4 @@
-package com.github.javacommons.encryption.test;
+package com.github.javacommons.encryption;
 
 import com.github.javacommons.encryption.CryptoUtils;
 import java.security.InvalidKeyException;
@@ -19,7 +19,7 @@ import javax.crypto.NoSuchPaddingException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class TestRSA {
+public class Test03_RSA {
 
     @Test
     public void test1() throws NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, NoSuchPaddingException, InvalidKeySpecException {
@@ -36,11 +36,11 @@ public class TestRSA {
         PrivateKey privateKey2 = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(privateKey.getEncoded()));
         PublicKey publicKey2 = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(publicKey.getEncoded()));
 
-        System.out.printf("privateKey(%d)=%s\n", privateKey.getEncoded().length, CryptoUtils.hex(privateKey.getEncoded()));
-        System.out.printf("privateKey2(%d)=%s\n", privateKey2.getEncoded().length, CryptoUtils.hex(privateKey2.getEncoded()));
+        System.out.printf("privateKey(%d)=%s\n", privateKey.getEncoded().length, CryptoUtils.bytes2Hex(privateKey.getEncoded()));
+        System.out.printf("privateKey2(%d)=%s\n", privateKey2.getEncoded().length, CryptoUtils.bytes2Hex(privateKey2.getEncoded()));
 
-        System.out.printf("publicKey(%d)=%s\n", publicKey.getEncoded().length, CryptoUtils.hex(publicKey.getEncoded()));
-        System.out.printf("publicKey2(%d)=%s\n", publicKey2.getEncoded().length, CryptoUtils.hex(publicKey2.getEncoded()));
+        System.out.printf("publicKey(%d)=%s\n", publicKey.getEncoded().length, CryptoUtils.bytes2Hex(publicKey.getEncoded()));
+        System.out.printf("publicKey2(%d)=%s\n", publicKey2.getEncoded().length, CryptoUtils.bytes2Hex(publicKey2.getEncoded()));
 
         byte[] data = "abc漢字".getBytes();
         System.out.printf("data=%s\n", new String(data));
@@ -49,13 +49,13 @@ public class TestRSA {
         cipher.init(Cipher.ENCRYPT_MODE, publicKey2);
         byte[] encoded = cipher.doFinal(data);
 
-        System.out.printf("encoded(%d)=%s\n", encoded.length, CryptoUtils.hex(encoded));
+        System.out.printf("encoded(%d)=%s\n", encoded.length, CryptoUtils.bytes2Hex(encoded));
 
         //Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.DECRYPT_MODE, privateKey2);
         byte[] data2 = cipher.doFinal(encoded);
 
-        System.out.printf("data2(%d)=%s\n", data2.length, CryptoUtils.hex(data2));
+        System.out.printf("data2(%d)=%s\n", data2.length, CryptoUtils.bytes2Hex(data2));
         System.out.printf("data2=%s\n", new String(data2));
         
         assertTrue(true);

@@ -9,7 +9,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UnicodeRangeGenerator {
+public final class UnicodeRangeGenerator {
 
     public static void main(String[] args) throws UnsupportedEncodingException, FileNotFoundException {
         new File("/home/javacommons").mkdirs();
